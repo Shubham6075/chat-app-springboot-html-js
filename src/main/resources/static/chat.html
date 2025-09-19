@@ -1,0 +1,536 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Spring Boot Socket.IO Chat</title>-->
+<!--    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>-->
+
+<!--    <style>-->
+<!--        body {-->
+<!--            font-family: 'Segoe UI', sans-serif;-->
+<!--            background-color: #f2f2f2;-->
+<!--            padding: 20px;-->
+<!--        }-->
+
+<!--        h2 {-->
+<!--            color: #333;-->
+<!--        }-->
+
+<!--        #connect-section {-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+
+<!--        input, button {-->
+<!--            padding: 10px;-->
+<!--            margin: 5px;-->
+<!--            border: 1px solid #ccc;-->
+<!--            border-radius: 5px;-->
+<!--        }-->
+
+<!--        #chat {-->
+<!--            background-color: #fff;-->
+<!--            padding: 20px;-->
+<!--            border-radius: 8px;-->
+<!--            max-width: 600px;-->
+<!--            box-shadow: 0 0 10px rgba(0,0,0,0.1);-->
+<!--        }-->
+
+<!--        #messages {-->
+<!--            list-style-type: none;-->
+<!--            padding: 0;-->
+<!--            max-height: 300px;-->
+<!--            overflow-y: auto;-->
+<!--            margin-bottom: 15px;-->
+<!--        }-->
+
+<!--        #messages li {-->
+<!--            padding: 8px;-->
+<!--            margin-bottom: 10px;-->
+<!--            background-color: #e6f7ff;-->
+<!--            border-radius: 4px;-->
+<!--        }-->
+
+<!--        #messages li.system {-->
+<!--            background-color: #fff3cd;-->
+<!--            color: #856404;-->
+<!--            font-style: italic;-->
+<!--        }-->
+
+<!--        .message-input {-->
+<!--            display: flex;-->
+<!--        }-->
+
+<!--        .message-input input {-->
+<!--            flex: 1;-->
+<!--        }-->
+
+<!--        .message-input button {-->
+<!--            background-color: #28a745;-->
+<!--            color: white;-->
+<!--            border: none;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+
+<!--<h2>💬 Group Chat</h2>-->
+
+<!--<div id="connect-section">-->
+<!--    <input id="username" placeholder="Your name" />-->
+<!--    <input id="room" placeholder="Room name" />-->
+<!--    <button onclick="connect()">Connect</button>-->
+<!--</div>-->
+
+<!--<div id="chat" style="display:none;">-->
+<!--    <ul id="messages"></ul>-->
+<!--    <div class="message-input">-->
+<!--        <input id="message" placeholder="Type a message..." />-->
+<!--        <button onclick="send()">Send</button>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--    let socket;-->
+<!--    let username;-->
+<!--    let room;-->
+
+<!--    function connect() {-->
+<!--        username = document.getElementById('username').value;-->
+<!--        room = document.getElementById('room').value;-->
+
+<!--        if (!username || !room) {-->
+<!--            alert("Please enter both username and room.");-->
+<!--            return;-->
+<!--        }-->
+
+<!--        socket = io("http://localhost:9090", {-->
+<!--            query: { username, room }-->
+<!--        });-->
+
+<!--        socket.on("connect", () => {-->
+<!--            document.getElementById('chat').style.display = 'block';-->
+<!--            document.getElementById('connect-section').style.display = 'none';-->
+<!--            console.log("✅ Connected to Socket.IO server");-->
+<!--        });-->
+
+<!--        socket.on("get_message", (msg) => {-->
+<!--            const li = document.createElement("li");-->
+
+<!--            const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : '';-->
+<!--            li.innerText = `[${time}] ${msg.sender || 'System'}: ${msg.message}`;-->
+
+<!--            if (msg.systemMessage) {-->
+<!--                li.classList.add("system");-->
+<!--            }-->
+
+<!--            document.getElementById("messages").appendChild(li);-->
+<!--        });-->
+<!--    }-->
+
+<!--    function send() {-->
+<!--        const message = document.getElementById('message').value;-->
+
+<!--        if (!message) return;-->
+
+<!--        socket.emit("send_message", {-->
+<!--            message: message,-->
+<!--            room: room-->
+<!--        });-->
+
+<!--        document.getElementById('message').value = '';-->
+<!--    }-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
+
+
+
+
+
+
+<!--<! main html >-->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Spring Boot Socket.IO Chat</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        #connect-section {
+            margin-bottom: 20px;
+        }
+
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #chat {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        #messages {
+            list-style-type: none;
+            padding: 0;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 5px;
+        }
+
+        #messages li {
+            padding: 8px;
+            margin-bottom: 10px;
+            background-color: #e6f7ff;
+            border-radius: 4px;
+        }
+
+        #messages li.system {
+            background-color: #fff3cd;
+            color: #856404;
+            font-style: italic;
+        }
+
+        .message-input {
+            display: flex;
+        }
+
+        .message-input input {
+            flex: 1;
+        }
+
+        .message-input button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+        }
+
+        #typingIndicator {
+            font-style: italic;
+            color: #666;
+            height: 20px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>💬 Group Chat</h2>
+
+<div id="connect-section">
+    <input id="username" placeholder="Your name" />
+    <input id="room" placeholder="Room name" />
+    <button onclick="connect()">Connect</button>
+</div>
+
+<div id="chat" style="display:none;">
+    <ul id="messages"></ul>
+    <div id="typingIndicator"></div> <!-- Typing indicator here -->
+    <div class="message-input">
+        <input id="message" placeholder="Type a message..." autocomplete="off" />
+        <button onclick="send()">Send</button>
+    </div>
+</div>
+
+<script>
+    let socket;
+    let username;
+    let room;
+    let typingTimeout;
+
+    function connect() {
+        username = document.getElementById('username').value.trim();
+        room = document.getElementById('room').value.trim();
+
+        if (!username || !room) {
+            alert("Please enter both username and room.");
+            return;
+        }
+
+        socket = io("http://localhost:9090", {
+            query: { username, room }
+        });
+
+        socket.on("connect", () => {
+            document.getElementById('chat').style.display = 'block';
+            document.getElementById('connect-section').style.display = 'none';
+            console.log("✅ Connected to Socket.IO server");
+        });
+
+        socket.on("get_message", (msg) => {
+            const li = document.createElement("li");
+            const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : '';
+            li.innerText = `[${time}] ${msg.sender || 'System'}: ${msg.message}`;
+            if (msg.systemMessage) {
+                li.classList.add("system");
+            }
+            document.getElementById("messages").appendChild(li);
+            // Scroll to bottom when new message arrives
+            document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
+        });
+
+        // Listen for typing event
+        socket.on("typing", (userTyping) => {
+            const typingIndicator = document.getElementById("typingIndicator");
+            if(userTyping !== username){ // Don't show typing if it's current user
+                typingIndicator.innerText = `${userTyping} is typing...`;
+
+                // Clear previous timeout and set new to hide indicator
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                    typingIndicator.innerText = '';
+                }, 3000);
+            }
+        });
+
+        // Add input event listener here AFTER socket connects
+        const messageInput = document.getElementById('message');
+        messageInput.addEventListener('input', () => {
+            socket.emit('typing', 'typing');  // You can send any data, server ignores it
+        });
+    }
+
+    function send() {
+        const messageInput = document.getElementById('message');
+        const message = messageInput.value.trim();
+
+        if (!message) return;
+
+        socket.emit("send_message", {
+            message: message,
+            room: room
+        });
+
+        messageInput.value = '';
+    }
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8" />-->
+<!--    <title>Spring Boot Socket.IO Chat with Emoji</title>-->
+<!--    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/emoji-button@4.6.2/dist/emoji-button.min.js"></script>-->
+
+
+<!--    <style>-->
+<!--        body {-->
+<!--            font-family: 'Segoe UI', sans-serif;-->
+<!--            background-color: #f2f2f2;-->
+<!--            padding: 20px;-->
+<!--        }-->
+<!--        h2 {-->
+<!--            color: #333;-->
+<!--        }-->
+<!--        #connect-section {-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+<!--        input, button {-->
+<!--            padding: 10px;-->
+<!--            margin: 5px;-->
+<!--            border: 1px solid #ccc;-->
+<!--            border-radius: 5px;-->
+<!--        }-->
+<!--        #chat {-->
+<!--            background-color: #fff;-->
+<!--            padding: 20px;-->
+<!--            border-radius: 8px;-->
+<!--            max-width: 600px;-->
+<!--            box-shadow: 0 0 10px rgba(0,0,0,0.1);-->
+<!--        }-->
+<!--        #messages {-->
+<!--            list-style-type: none;-->
+<!--            padding: 0;-->
+<!--            max-height: 300px;-->
+<!--            overflow-y: auto;-->
+<!--            margin-bottom: 5px;-->
+<!--        }-->
+<!--        #messages li {-->
+<!--            padding: 8px;-->
+<!--            margin-bottom: 10px;-->
+<!--            background-color: #e6f7ff;-->
+<!--            border-radius: 4px;-->
+<!--            word-break: break-word;-->
+<!--        }-->
+<!--        #messages li.system {-->
+<!--            background-color: #fff3cd;-->
+<!--            color: #856404;-->
+<!--            font-style: italic;-->
+<!--        }-->
+<!--        .message-input {-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--        }-->
+<!--        .message-input input {-->
+<!--            flex: 1;-->
+<!--            font-size: 16px;-->
+<!--        }-->
+<!--        .message-input button {-->
+<!--            background-color: #28a745;-->
+<!--            color: white;-->
+<!--            border: none;-->
+<!--            cursor: pointer;-->
+<!--        }-->
+<!--        /* Emoji button styling */-->
+<!--        .message-input button#emoji-btn {-->
+<!--            background: transparent;-->
+<!--            border: none;-->
+<!--            font-size: 24px;-->
+<!--            cursor: pointer;-->
+<!--            margin-right: 5px;-->
+<!--            user-select: none;-->
+<!--        }-->
+<!--        #typingIndicator {-->
+<!--            font-style: italic;-->
+<!--            color: #666;-->
+<!--            height: 20px;-->
+<!--            margin-bottom: 10px;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+
+<!--<h2>💬 Group Chat</h2>-->
+
+<!--<div id="connect-section">-->
+<!--    <input id="username" placeholder="Your name" autocomplete="off" />-->
+<!--    <input id="room" placeholder="Room name" autocomplete="off" />-->
+<!--    <button onclick="connect()">Connect</button>-->
+<!--</div>-->
+
+<!--<div id="chat" style="display:none;">-->
+<!--    <ul id="messages"></ul>-->
+<!--    <div id="typingIndicator"></div> &lt;!&ndash; Typing indicator here &ndash;&gt;-->
+<!--    <div class="message-input">-->
+<!--        <button id="emoji-btn" type="button" title="Pick emoji">😊</button>-->
+<!--        <input id="message" placeholder="Type a message..." autocomplete="off" />-->
+<!--        <button onclick="send()">Send</button>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--    let socket;-->
+<!--    let username;-->
+<!--    let room;-->
+<!--    let typingTimeout;-->
+
+<!--    function connect() {-->
+<!--        username = document.getElementById('username').value.trim();-->
+<!--        room = document.getElementById('room').value.trim();-->
+
+<!--        if (!username || !room) {-->
+<!--            alert("Please enter both username and room.");-->
+<!--            return;-->
+<!--        }-->
+
+<!--        socket = io("http://localhost:9090", {-->
+<!--            query: { username, room }-->
+<!--        });-->
+
+<!--        socket.on("connect", () => {-->
+<!--            document.getElementById('chat').style.display = 'block';-->
+<!--            document.getElementById('connect-section').style.display = 'none';-->
+<!--            console.log("✅ Connected to Socket.IO server");-->
+<!--        });-->
+
+<!--        socket.on("get_message", (msg) => {-->
+<!--            const li = document.createElement("li");-->
+<!--            const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : '';-->
+<!--            li.innerText = `[${time}] ${msg.sender || 'System'}: ${msg.message}`;-->
+<!--            if (msg.systemMessage) {-->
+<!--                li.classList.add("system");-->
+<!--            }-->
+<!--            document.getElementById("messages").appendChild(li);-->
+
+<!--            // Scroll to bottom when new message arrives-->
+<!--            const messages = document.getElementById("messages");-->
+<!--            messages.scrollTop = messages.scrollHeight;-->
+<!--        });-->
+
+<!--        // Listen for typing event-->
+<!--        socket.on("typing", (userTyping) => {-->
+<!--            const typingIndicator = document.getElementById("typingIndicator");-->
+<!--            if (userTyping !== username) { // Don't show typing if it's current user-->
+<!--                typingIndicator.innerText = `${userTyping} is typing...`;-->
+
+<!--                // Clear previous timeout and set new to hide indicator-->
+<!--                clearTimeout(typingTimeout);-->
+<!--                typingTimeout = setTimeout(() => {-->
+<!--                    typingIndicator.innerText = '';-->
+<!--                }, 3000);-->
+<!--            }-->
+<!--        });-->
+
+<!--        // Add input event listener here AFTER socket connects-->
+<!--        const messageInput = document.getElementById('message');-->
+<!--        messageInput.addEventListener('input', () => {-->
+<!--            socket.emit('typing', username);  // Send current username to server-->
+<!--        });-->
+
+<!--        // Initialize Emoji Picker-->
+<!--        const button = document.querySelector('#emoji-btn');-->
+<!--        const input = document.querySelector('#message');-->
+<!--        const picker = new EmojiButton();-->
+
+<!--        picker.on('emoji', emoji => {-->
+<!--            // Insert emoji at cursor position in input field-->
+<!--            const start = input.selectionStart;-->
+<!--            const end = input.selectionEnd;-->
+<!--            const text = input.value;-->
+<!--            input.value = text.slice(0, start) + emoji + text.slice(end);-->
+<!--            input.selectionStart = input.selectionEnd = start + emoji.length;-->
+<!--            input.focus();-->
+<!--        });-->
+
+<!--        button.addEventListener('click', () => {-->
+<!--            picker.togglePicker(button);-->
+<!--        });-->
+<!--    }-->
+
+<!--    function send() {-->
+<!--        const messageInput = document.getElementById('message');-->
+<!--        const message = messageInput.value.trim();-->
+
+<!--        if (!message) return;-->
+
+<!--        socket.emit("send_message", {-->
+<!--            message: message,-->
+<!--            room: room-->
+<!--        });-->
+
+<!--        messageInput.value = '';-->
+<!--    }-->
+<!--</script>-->
+
+<!--</body>-->
+<!--</html>-->
