@@ -13,6 +13,8 @@ public class Message {
     private String sender;
     private boolean systemMessage;
     private String timestamp;
+    private String replyToMessage;
+    private String replyToSender;
 
     public Message() {
 

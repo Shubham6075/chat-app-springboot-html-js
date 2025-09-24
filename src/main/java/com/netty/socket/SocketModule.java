@@ -66,7 +66,15 @@ public class SocketModule {
             data.setTimestamp(Instant.now().toString());
             data.setSystemMessage(false);
 
-            log.info("📩 Message received from [{}]: {}", senderUsername, data);
+            if (data.getReplyToMessage() != null) {
+                log.info("↩️ [{}] replied to [{}]: {} -> {}",
+                        senderUsername,
+                        data.getReplyToSender(),
+                        data.getReplyToMessage(),
+                        data.getMessage());
+            } else {
+                log.info("📩 [{}] sent message: {}", senderUsername, data.getMessage());
+            }
 
             socketService.sendMessage(
                     data.getRoom(),

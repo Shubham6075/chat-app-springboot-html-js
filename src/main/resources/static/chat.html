@@ -1,239 +1,164 @@
-<!--<!DOCTYPE html>-->
-<!--<html lang="en">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <title>Spring Boot Socket.IO Chat</title>-->
-<!--    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>-->
-
-<!--    <style>-->
-<!--        body {-->
-<!--            font-family: 'Segoe UI', sans-serif;-->
-<!--            background-color: #f2f2f2;-->
-<!--            padding: 20px;-->
-<!--        }-->
-
-<!--        h2 {-->
-<!--            color: #333;-->
-<!--        }-->
-
-<!--        #connect-section {-->
-<!--            margin-bottom: 20px;-->
-<!--        }-->
-
-<!--        input, button {-->
-<!--            padding: 10px;-->
-<!--            margin: 5px;-->
-<!--            border: 1px solid #ccc;-->
-<!--            border-radius: 5px;-->
-<!--        }-->
-
-<!--        #chat {-->
-<!--            background-color: #fff;-->
-<!--            padding: 20px;-->
-<!--            border-radius: 8px;-->
-<!--            max-width: 600px;-->
-<!--            box-shadow: 0 0 10px rgba(0,0,0,0.1);-->
-<!--        }-->
-
-<!--        #messages {-->
-<!--            list-style-type: none;-->
-<!--            padding: 0;-->
-<!--            max-height: 300px;-->
-<!--            overflow-y: auto;-->
-<!--            margin-bottom: 15px;-->
-<!--        }-->
-
-<!--        #messages li {-->
-<!--            padding: 8px;-->
-<!--            margin-bottom: 10px;-->
-<!--            background-color: #e6f7ff;-->
-<!--            border-radius: 4px;-->
-<!--        }-->
-
-<!--        #messages li.system {-->
-<!--            background-color: #fff3cd;-->
-<!--            color: #856404;-->
-<!--            font-style: italic;-->
-<!--        }-->
-
-<!--        .message-input {-->
-<!--            display: flex;-->
-<!--        }-->
-
-<!--        .message-input input {-->
-<!--            flex: 1;-->
-<!--        }-->
-
-<!--        .message-input button {-->
-<!--            background-color: #28a745;-->
-<!--            color: white;-->
-<!--            border: none;-->
-<!--        }-->
-<!--    </style>-->
-<!--</head>-->
-<!--<body>-->
-
-<!--<h2>💬 Group Chat</h2>-->
-
-<!--<div id="connect-section">-->
-<!--    <input id="username" placeholder="Your name" />-->
-<!--    <input id="room" placeholder="Room name" />-->
-<!--    <button onclick="connect()">Connect</button>-->
-<!--</div>-->
-
-<!--<div id="chat" style="display:none;">-->
-<!--    <ul id="messages"></ul>-->
-<!--    <div class="message-input">-->
-<!--        <input id="message" placeholder="Type a message..." />-->
-<!--        <button onclick="send()">Send</button>-->
-<!--    </div>-->
-<!--</div>-->
-
-<!--<script>-->
-<!--    let socket;-->
-<!--    let username;-->
-<!--    let room;-->
-
-<!--    function connect() {-->
-<!--        username = document.getElementById('username').value;-->
-<!--        room = document.getElementById('room').value;-->
-
-<!--        if (!username || !room) {-->
-<!--            alert("Please enter both username and room.");-->
-<!--            return;-->
-<!--        }-->
-
-<!--        socket = io("http://localhost:9090", {-->
-<!--            query: { username, room }-->
-<!--        });-->
-
-<!--        socket.on("connect", () => {-->
-<!--            document.getElementById('chat').style.display = 'block';-->
-<!--            document.getElementById('connect-section').style.display = 'none';-->
-<!--            console.log("✅ Connected to Socket.IO server");-->
-<!--        });-->
-
-<!--        socket.on("get_message", (msg) => {-->
-<!--            const li = document.createElement("li");-->
-
-<!--            const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : '';-->
-<!--            li.innerText = `[${time}] ${msg.sender || 'System'}: ${msg.message}`;-->
-
-<!--            if (msg.systemMessage) {-->
-<!--                li.classList.add("system");-->
-<!--            }-->
-
-<!--            document.getElementById("messages").appendChild(li);-->
-<!--        });-->
-<!--    }-->
-
-<!--    function send() {-->
-<!--        const message = document.getElementById('message').value;-->
-
-<!--        if (!message) return;-->
-
-<!--        socket.emit("send_message", {-->
-<!--            message: message,-->
-<!--            room: room-->
-<!--        });-->
-
-<!--        document.getElementById('message').value = '';-->
-<!--    }-->
-<!--</script>-->
-<!--</body>-->
-<!--</html>-->
-
-
-
-
-
-
-<!--<! main html >-->
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Spring Boot Socket.IO Chat</title>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f2f2f2;
-            padding: 20px;
+          font-family: 'Segoe UI', sans-serif;
+          background-color: #ece5dd;
+          margin: 0;
+          padding: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
         }
-
-        h2 {
-            color: #333;
-        }
-
-        #connect-section {
-            margin-bottom: 20px;
-        }
-
-        input, button {
-            padding: 10px;
-            margin: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
         #chat {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            max-width: 600px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+          width: 420px;
+          height: 600px;
+          background: #fff;
+          display: flex;
+          flex-direction: column;
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
-
+        .chat-header {
+          background: #075E54;
+          color: white;
+          padding: 12px;
+          font-size: 18px;
+          font-weight: bold;
+        }
         #messages {
-            list-style-type: none;
-            padding: 0;
-            max-height: 300px;
-            overflow-y: auto;
-            margin-bottom: 5px;
+          flex: 1;
+          padding: 10px;
+          list-style: none;
+          margin: 0;
+          overflow-y: auto;
+          background: #e5ddd5;
         }
-
-        #messages li {
-            padding: 8px;
-            margin-bottom: 10px;
-            background-color: #e6f7ff;
-            border-radius: 4px;
+        .system-message {
+          text-align: center;
+          color: #777;
+          font-size: 13px;
+          margin: 10px 0;
+          font-style: italic;
         }
-
-        #messages li.system {
-            background-color: #fff3cd;
-            color: #856404;
-            font-style: italic;
+        .message-row {
+          display: flex;
+          align-items: flex-start;
+          margin: 10px 0;
         }
-
+        .message-row.my { justify-content: flex-end; }
+        .avatar {
+          width: 35px;
+          height: 35px;
+          border-radius: 50%;
+          color: white;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-weight: bold;
+          margin: 0 8px;
+          flex-shrink: 0;
+        }
+        .message-container {
+          display: flex;
+          flex-direction: column;
+          max-width: 65%;
+        }
+        .sender-name {
+          font-weight: bold;
+          font-size: 13px;
+          margin-bottom: 3px;
+          color: #333;
+        }
+        .message {
+          padding: 10px 14px;
+          border-radius: 12px;
+          font-size: 14px;
+          word-wrap: break-word;
+          position: relative;
+          background: #fff;
+        }
+        .my .message { background: #dcf8c6; border-bottom-right-radius: 0; }
+        .other .message { border-bottom-left-radius: 0; }
+        .reply-box {
+          font-size: 14px;
+          color: #222;
+          border-left: 4px solid #888;
+          padding: 8px 10px;
+          margin-bottom: 6px;
+          background: #f5f5f5;
+          border-radius: 6px;
+        }
+        .message .time {
+          display: block;
+          font-size: 11px;
+          color: #555;
+          margin-top: 4px;
+          text-align: right;
+        }
+        .reply-preview {
+          display: none;
+          padding: 6px;
+          background: #f0f0f0;
+          border-left: 3px solid #075E54;
+          margin: 0 10px 5px;
+          font-size: 13px;
+          position: relative;
+        }
+        .reply-preview button {
+          position: absolute;
+          top: 3px;
+          right: 3px;
+          background: transparent;
+          border: none;
+          font-size: 16px;
+          cursor: pointer;
+          color: #555;
+        }
         .message-input {
-            display: flex;
+          display: flex;
+          flex-direction: column;
+          background: #f0f0f0;
+          border-top: 1px solid #ddd;
         }
-
+        .message-input-inner {
+          display: flex;
+          padding: 10px;
+        }
         .message-input input {
-            flex: 1;
+          flex: 1;
+          padding: 10px;
+          border: none;
+          border-radius: 20px;
+          outline: none;
         }
-
         .message-input button {
-            background-color: #28a745;
-            color: white;
-            border: none;
+          margin-left: 10px;
+          background: #25D366;
+          border: none;
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          cursor: pointer;
+          color: white;
+          font-weight: bold;
         }
-
         #typingIndicator {
-            font-style: italic;
-            color: #666;
-            height: 20px;
-            margin-bottom: 10px;
+          font-style: italic;
+          color: #666;
+          font-size: 13px;
+          margin: 5px 10px;
+          height: 18px;
         }
     </style>
 </head>
 <body>
-
-<h2>💬 Group Chat</h2>
 
 <div id="connect-section">
     <input id="username" placeholder="Your name" />
@@ -242,11 +167,21 @@
 </div>
 
 <div id="chat" style="display:none;">
+    <div class="chat-header">💬 Group Chat</div>
     <ul id="messages"></ul>
-    <div id="typingIndicator"></div> <!-- Typing indicator here -->
+    <div id="typingIndicator"></div>
+
+    <!-- Reply preview -->
+    <div id="replyPreview" class="reply-preview">
+        Replying to <span id="replySender"></span>: <span id="replyText"></span>
+<!--        <button onclick="cancelReply()">❌</button>-->
+    </div>
+
     <div class="message-input">
-        <input id="message" placeholder="Type a message..." autocomplete="off" />
-        <button onclick="send()">Send</button>
+        <div class="message-input-inner">
+            <input id="message" placeholder="Type a message..." autocomplete="off" />
+            <button onclick="send()">➤</button>
+        </div>
     </div>
 </div>
 
@@ -255,282 +190,161 @@
     let username;
     let room;
     let typingTimeout;
+    const userColors = {};
+    let replyTo = null;
+
+    // Timer for auto cancel reply
+    let replyTimeoutId = null;
+
+    function getRandomColor(name) {
+      if (userColors[name]) return userColors[name];
+      const colors = ["#f06292","#ba68c8","#64b5f6","#4db6ac","#81c784","#ffd54f","#ff8a65"];
+      userColors[name] = colors[Math.floor(Math.random() * colors.length)];
+      return userColors[name];
+    }
+
+    function getAvatarLetter(name) {
+      return name ? name.charAt(0).toUpperCase() : "?";
+    }
 
     function connect() {
-        username = document.getElementById('username').value.trim();
-        room = document.getElementById('room').value.trim();
+      username = document.getElementById('username').value.trim();
+      room = document.getElementById('room').value.trim();
+      if (!username || !room) { alert("Please enter both username and room."); return; }
 
-        if (!username || !room) {
-            alert("Please enter both username and room.");
-            return;
+      socket = io("http://localhost:9090", { query: { username, room } });
+
+      socket.on("connect", () => {
+        document.getElementById('chat').style.display = 'flex';
+        document.getElementById('connect-section').style.display = 'none';
+      });
+
+      socket.on("get_message", (msg) => {
+        const ul = document.getElementById("messages");
+        const li = document.createElement("li");
+
+        if (msg.systemMessage) {
+          li.classList.add("system-message");
+          li.innerText = msg.message;
+        } else {
+          const row = document.createElement("div");
+          row.classList.add("message-row");
+          row.classList.add(msg.sender === username ? "my" : "other");
+
+          const avatar = document.createElement("div");
+          avatar.classList.add("avatar");
+          avatar.style.background = getRandomColor(msg.sender);
+          avatar.innerText = getAvatarLetter(msg.sender);
+
+          const container = document.createElement("div");
+          container.classList.add("message-container");
+
+          // Username outside message
+          const senderName = document.createElement("div");
+          senderName.classList.add("sender-name");
+          senderName.innerText = msg.sender;
+
+          const bubble = document.createElement("div");
+          bubble.classList.add("message");
+
+          // Reply
+          if (msg.replyToMessage) {
+            bubble.innerHTML += `<div class="reply-box">↩ ${msg.replyToSender}: ${msg.replyToMessage}</div>`;
+          }
+
+          bubble.innerHTML += `${msg.message}<span class="time">${new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
+
+          container.appendChild(senderName);
+          container.appendChild(bubble);
+
+          // Double-click to reply (desktop)
+          bubble.addEventListener("dblclick", () => setReply(msg.sender, msg.message));
+
+          // Touch swipe to reply (left swipe)
+          let startX;
+          bubble.addEventListener("touchstart", (e) => { startX = e.changedTouches[0].clientX; });
+          bubble.addEventListener("touchend", (e) => {
+            let endX = e.changedTouches[0].clientX;
+            if (startX - endX > 50) {
+              setReply(msg.sender, msg.message);
+            }
+          });
+
+          if (msg.sender === username) { row.appendChild(container); row.appendChild(avatar); }
+          else { row.appendChild(avatar); row.appendChild(container); }
+
+          li.appendChild(row);
         }
+        ul.appendChild(li);
+        ul.scrollTop = ul.scrollHeight;
+      });
 
-        socket = io("http://localhost:9090", {
-            query: { username, room }
-        });
+      socket.on("typing", (userTyping) => {
+        const typingIndicator = document.getElementById("typingIndicator");
+        if (userTyping !== username) {
+          typingIndicator.innerText = `${userTyping} is typing...`;
+          clearTimeout(typingTimeout);
+          typingTimeout = setTimeout(() => { typingIndicator.innerText = ""; }, 2500);
+        }
+      });
 
-        socket.on("connect", () => {
-            document.getElementById('chat').style.display = 'block';
-            document.getElementById('connect-section').style.display = 'none';
-            console.log("✅ Connected to Socket.IO server");
-        });
+      const messageInput = document.getElementById("message");
+      messageInput.addEventListener("input", () => { socket.emit("typing", username); });
 
-        socket.on("get_message", (msg) => {
-            const li = document.createElement("li");
-            const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : '';
-            li.innerText = `[${time}] ${msg.sender || 'System'}: ${msg.message}`;
-            if (msg.systemMessage) {
-                li.classList.add("system");
-            }
-            document.getElementById("messages").appendChild(li);
-            // Scroll to bottom when new message arrives
-            document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
-        });
-
-        // Listen for typing event
-        socket.on("typing", (userTyping) => {
-            const typingIndicator = document.getElementById("typingIndicator");
-            if(userTyping !== username){ // Don't show typing if it's current user
-                typingIndicator.innerText = `${userTyping} is typing...`;
-
-                // Clear previous timeout and set new to hide indicator
-                clearTimeout(typingTimeout);
-                typingTimeout = setTimeout(() => {
-                    typingIndicator.innerText = '';
-                }, 3000);
-            }
-        });
-
-        // Add input event listener here AFTER socket connects
-        const messageInput = document.getElementById('message');
-        messageInput.addEventListener('input', () => {
-            socket.emit('typing', 'typing');  // You can send any data, server ignores it
-        });
+      // Swipe right to cancel reply on mobile (on message input)
+      let inputStartX = null;
+      messageInput.addEventListener("touchstart", (e) => { inputStartX = e.changedTouches[0].clientX; });
+      messageInput.addEventListener("touchend", (e) => {
+        if (inputStartX === null) return;
+        let inputEndX = e.changedTouches[0].clientX;
+        if (inputEndX - inputStartX > 50) { // swipe right detected
+          cancelReply();
+        }
+        inputStartX = null;
+      });
     }
 
     function send() {
-        const messageInput = document.getElementById('message');
-        const message = messageInput.value.trim();
+      const messageInput = document.getElementById('message');
+      const message = messageInput.value.trim();
+      if (!message) return;
 
-        if (!message) return;
+      socket.emit("send_message", {
+        message: message,
+        room: room,
+        replyToMessage: replyTo ? replyTo.message : null,
+        replyToSender: replyTo ? replyTo.sender : null
+      });
 
-        socket.emit("send_message", {
-            message: message,
-            room: room
-        });
+      messageInput.value = '';
+      cancelReply();
+    }
 
-        messageInput.value = '';
+    function setReply(sender, message) {
+      replyTo = { sender, message };
+      document.getElementById("replyPreview").style.display = "block";
+      document.getElementById("replySender").innerText = sender;
+      document.getElementById("replyText").innerText = message;
+
+      // Clear any existing timer
+      if (replyTimeoutId) clearTimeout(replyTimeoutId);
+
+      // Set auto cancel after 10 seconds (desktop)
+      replyTimeoutId = setTimeout(() => {
+        cancelReply();
+      }, 4000);
+    }
+
+    function cancelReply() {
+      replyTo = null;
+      document.getElementById("replyPreview").style.display = "none";
+      // Clear the timer if any
+      if (replyTimeoutId) {
+        clearTimeout(replyTimeoutId);
+        replyTimeoutId = null;
+      }
     }
 </script>
 </body>
 </html>
 
-
-
-
-
-
-
-
-
-
-<!--<!DOCTYPE html>-->
-<!--<html lang="en">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8" />-->
-<!--    <title>Spring Boot Socket.IO Chat with Emoji</title>-->
-<!--    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>-->
-<!--    <script src="https://cdn.jsdelivr.net/npm/emoji-button@4.6.2/dist/emoji-button.min.js"></script>-->
-
-
-<!--    <style>-->
-<!--        body {-->
-<!--            font-family: 'Segoe UI', sans-serif;-->
-<!--            background-color: #f2f2f2;-->
-<!--            padding: 20px;-->
-<!--        }-->
-<!--        h2 {-->
-<!--            color: #333;-->
-<!--        }-->
-<!--        #connect-section {-->
-<!--            margin-bottom: 20px;-->
-<!--        }-->
-<!--        input, button {-->
-<!--            padding: 10px;-->
-<!--            margin: 5px;-->
-<!--            border: 1px solid #ccc;-->
-<!--            border-radius: 5px;-->
-<!--        }-->
-<!--        #chat {-->
-<!--            background-color: #fff;-->
-<!--            padding: 20px;-->
-<!--            border-radius: 8px;-->
-<!--            max-width: 600px;-->
-<!--            box-shadow: 0 0 10px rgba(0,0,0,0.1);-->
-<!--        }-->
-<!--        #messages {-->
-<!--            list-style-type: none;-->
-<!--            padding: 0;-->
-<!--            max-height: 300px;-->
-<!--            overflow-y: auto;-->
-<!--            margin-bottom: 5px;-->
-<!--        }-->
-<!--        #messages li {-->
-<!--            padding: 8px;-->
-<!--            margin-bottom: 10px;-->
-<!--            background-color: #e6f7ff;-->
-<!--            border-radius: 4px;-->
-<!--            word-break: break-word;-->
-<!--        }-->
-<!--        #messages li.system {-->
-<!--            background-color: #fff3cd;-->
-<!--            color: #856404;-->
-<!--            font-style: italic;-->
-<!--        }-->
-<!--        .message-input {-->
-<!--            display: flex;-->
-<!--            align-items: center;-->
-<!--        }-->
-<!--        .message-input input {-->
-<!--            flex: 1;-->
-<!--            font-size: 16px;-->
-<!--        }-->
-<!--        .message-input button {-->
-<!--            background-color: #28a745;-->
-<!--            color: white;-->
-<!--            border: none;-->
-<!--            cursor: pointer;-->
-<!--        }-->
-<!--        /* Emoji button styling */-->
-<!--        .message-input button#emoji-btn {-->
-<!--            background: transparent;-->
-<!--            border: none;-->
-<!--            font-size: 24px;-->
-<!--            cursor: pointer;-->
-<!--            margin-right: 5px;-->
-<!--            user-select: none;-->
-<!--        }-->
-<!--        #typingIndicator {-->
-<!--            font-style: italic;-->
-<!--            color: #666;-->
-<!--            height: 20px;-->
-<!--            margin-bottom: 10px;-->
-<!--        }-->
-<!--    </style>-->
-<!--</head>-->
-<!--<body>-->
-
-<!--<h2>💬 Group Chat</h2>-->
-
-<!--<div id="connect-section">-->
-<!--    <input id="username" placeholder="Your name" autocomplete="off" />-->
-<!--    <input id="room" placeholder="Room name" autocomplete="off" />-->
-<!--    <button onclick="connect()">Connect</button>-->
-<!--</div>-->
-
-<!--<div id="chat" style="display:none;">-->
-<!--    <ul id="messages"></ul>-->
-<!--    <div id="typingIndicator"></div> &lt;!&ndash; Typing indicator here &ndash;&gt;-->
-<!--    <div class="message-input">-->
-<!--        <button id="emoji-btn" type="button" title="Pick emoji">😊</button>-->
-<!--        <input id="message" placeholder="Type a message..." autocomplete="off" />-->
-<!--        <button onclick="send()">Send</button>-->
-<!--    </div>-->
-<!--</div>-->
-
-<!--<script>-->
-<!--    let socket;-->
-<!--    let username;-->
-<!--    let room;-->
-<!--    let typingTimeout;-->
-
-<!--    function connect() {-->
-<!--        username = document.getElementById('username').value.trim();-->
-<!--        room = document.getElementById('room').value.trim();-->
-
-<!--        if (!username || !room) {-->
-<!--            alert("Please enter both username and room.");-->
-<!--            return;-->
-<!--        }-->
-
-<!--        socket = io("http://localhost:9090", {-->
-<!--            query: { username, room }-->
-<!--        });-->
-
-<!--        socket.on("connect", () => {-->
-<!--            document.getElementById('chat').style.display = 'block';-->
-<!--            document.getElementById('connect-section').style.display = 'none';-->
-<!--            console.log("✅ Connected to Socket.IO server");-->
-<!--        });-->
-
-<!--        socket.on("get_message", (msg) => {-->
-<!--            const li = document.createElement("li");-->
-<!--            const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : '';-->
-<!--            li.innerText = `[${time}] ${msg.sender || 'System'}: ${msg.message}`;-->
-<!--            if (msg.systemMessage) {-->
-<!--                li.classList.add("system");-->
-<!--            }-->
-<!--            document.getElementById("messages").appendChild(li);-->
-
-<!--            // Scroll to bottom when new message arrives-->
-<!--            const messages = document.getElementById("messages");-->
-<!--            messages.scrollTop = messages.scrollHeight;-->
-<!--        });-->
-
-<!--        // Listen for typing event-->
-<!--        socket.on("typing", (userTyping) => {-->
-<!--            const typingIndicator = document.getElementById("typingIndicator");-->
-<!--            if (userTyping !== username) { // Don't show typing if it's current user-->
-<!--                typingIndicator.innerText = `${userTyping} is typing...`;-->
-
-<!--                // Clear previous timeout and set new to hide indicator-->
-<!--                clearTimeout(typingTimeout);-->
-<!--                typingTimeout = setTimeout(() => {-->
-<!--                    typingIndicator.innerText = '';-->
-<!--                }, 3000);-->
-<!--            }-->
-<!--        });-->
-
-<!--        // Add input event listener here AFTER socket connects-->
-<!--        const messageInput = document.getElementById('message');-->
-<!--        messageInput.addEventListener('input', () => {-->
-<!--            socket.emit('typing', username);  // Send current username to server-->
-<!--        });-->
-
-<!--        // Initialize Emoji Picker-->
-<!--        const button = document.querySelector('#emoji-btn');-->
-<!--        const input = document.querySelector('#message');-->
-<!--        const picker = new EmojiButton();-->
-
-<!--        picker.on('emoji', emoji => {-->
-<!--            // Insert emoji at cursor position in input field-->
-<!--            const start = input.selectionStart;-->
-<!--            const end = input.selectionEnd;-->
-<!--            const text = input.value;-->
-<!--            input.value = text.slice(0, start) + emoji + text.slice(end);-->
-<!--            input.selectionStart = input.selectionEnd = start + emoji.length;-->
-<!--            input.focus();-->
-<!--        });-->
-
-<!--        button.addEventListener('click', () => {-->
-<!--            picker.togglePicker(button);-->
-<!--        });-->
-<!--    }-->
-
-<!--    function send() {-->
-<!--        const messageInput = document.getElementById('message');-->
-<!--        const message = messageInput.value.trim();-->
-
-<!--        if (!message) return;-->
-
-<!--        socket.emit("send_message", {-->
-<!--            message: message,-->
-<!--            room: room-->
-<!--        });-->
-
-<!--        messageInput.value = '';-->
-<!--    }-->
-<!--</script>-->
-
-<!--</body>-->
-<!--</html>-->
