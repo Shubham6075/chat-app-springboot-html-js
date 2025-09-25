@@ -10,7 +10,6 @@ import com.netty.service.SocketService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Component;
-import org.xml.sax.helpers.AttributesImpl;
 
 import java.time.Instant;
 import java.util.Map;
@@ -95,13 +94,13 @@ public class SocketModule {
                 connectedUsers.put(client.getSessionId(), username);
                 log.info("✅ [{}] joined room [{}]", username, room);
 
-                // Send old messages to this client
+
                 var history = socketService.getRoomMessages(room);
                 for (Message past : history) {
                     client.sendEvent("get_message", past);
                 }
 
-                // Notify others
+
                 Message joinMsg = new Message(username + " has joined the room.");
                 joinMsg.setRoom(room);
                 joinMsg.setSystemMessage(true);
@@ -125,7 +124,7 @@ public class SocketModule {
                 leaveMsg.setRoom(room);
                 leaveMsg.setSystemMessage(true);
                 leaveMsg.setTimestamp(Instant.now().toString());
-                server.getRoomOperations(room).sendEvent("get_message", leaveMsg);
+                socketService.sendMessage(room, "get_message", client, leaveMsg);
             }
         };
     }
